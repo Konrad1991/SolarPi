@@ -25,6 +25,9 @@ We provide a comprehensive list of components, accompanied by a schematic plan a
 - **Stepdown converter**
     * The stepdown converter regulates the voltage output from the battery or solar panel to match the requirements of specific components.
        It ensures a consistent and appropriate voltage level for the Raspberry Pi.
+- **Sensors**
+    * GY-68 BMP180 barometric air pressure and temperature sensor. Ordered from Az Delivery 
+    * DHT20 Digital temperature sensor and air humidity sensor with I2C interface 2.5V to 5.5V Compatible with Raspberry Pi board for DIY microelectronics projects. Ordered from Az Delivery
 
 ## Software Components
 
