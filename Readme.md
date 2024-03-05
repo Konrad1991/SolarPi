@@ -2,6 +2,8 @@
 
 # SolarPi
 
+![SolarPi Logo](./logo/SolarPi_Logo.png)
+
 🌱 **Project Status: Recently Initiated, Work in Progress**
 
 ## Overview 
