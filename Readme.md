@@ -1,11 +1,5 @@
 # SolarPi
 
-This project desribes how 
-to power a raspberry pi with
-a solar panel. \
-We list the individual components and 
-show the construction as schematice plan 
-and with photos of the final product. 
-Furthermore, the raspberry pi is used
-as backend server and as whether station. 
+This project details the process of powering a Raspberry Pi using a solar panel. We provide a comprehensive list of components, accompanied by a schematic plan and photos showcasing the final product. Additionally, the Raspberry Pi serves as both a backend server and a weather station in this setup.
 
+In addition to the hardware aspects, this project encompasses three crucial software components stored here. Firstly, there's the code essential for Raspberry Pi operations, which includes functionalities like safely shutting down the Pi in case of low battery status, particularly crucial during the colder months, such as December and January, in Germany. Secondly, we delve into the code responsible for controlling various sensors measuring light, humidity, temperature, and more. Finally, we address the software dedicated to utilizing the Raspberry Pi as a backend server. This involves crafting code for both the Pi itself and our personal computers and smartphones. Throughout the entire project, the language of choice for coding is Rust, ensuring robust and efficient implementation.
