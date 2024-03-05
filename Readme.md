@@ -10,6 +10,12 @@ The SolarPi project focuses on harnessing solar energy to power a Raspberry Pi w
 
 We provide a comprehensive list of components, accompanied by a schematic plan and photos showcasing the final product. Additionally, the Raspberry Pi serves as both a backend server and a weather station in this setup.
 
+### Hardware list:
+
+- Solar panel:
+    * [Amazon Link](https://www.amazon.de/dp/B075X49XJS?tag=idealode-am-pk-21&ascsubtag=2024-02-28_45582a61d1533d4954e668a287c172221c40feb7d104ff73492b0fa5fe674e25&th=1)
+    * 80 W, 12 V; monocrystalline solar panel
+
 ## Software Components
 
 - Firstly, there's the code essential for Raspberry Pi operations, which includes functionalities like safely shutting down the Pi in case of low battery status, particularly crucial during the colder months, such as December and January, in Germany.
