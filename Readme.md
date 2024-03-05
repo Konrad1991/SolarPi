@@ -2,7 +2,7 @@
 
 # SolarPi
 
-![SolarPi Logo](./logo/SolarPi_Logo.png)
+<img src="./logo/SolarPi_Logo.png" alt="SolarPi Logo" width="200"/>
 
 🌱 **Project Status: Recently Initiated, Work in Progress**
 
