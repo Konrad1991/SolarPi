@@ -12,9 +12,19 @@ We provide a comprehensive list of components, accompanied by a schematic plan a
 
 ### Hardware list:
 
-- Solar panel:
+- **Raspberry Pi 4** 
+    * The Raspberry Pi 4 serves as the core computing unit for the SolarPi project. It handles various tasks, including operating as a backend server and weather station.
+    * ([More Information](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/))
+- **Solar panel**
     * [Amazon Link](https://www.amazon.de/dp/B075X49XJS?tag=idealode-am-pk-21&ascsubtag=2024-02-28_45582a61d1533d4954e668a287c172221c40feb7d104ff73492b0fa5fe674e25&th=1)
-    * 80 W, 12 V; monocrystalline solar panel
+    * 80 W, 12 V; monocrystalline solar panel, providing a sustainable and renewable power source for the Raspberry Pi setup.
+- **Solar regulator**
+    * The solar regulator, also known as a charge controller, manages the power flow from the solar panel to prevent overcharging the battery. It ensures optimal charging and extends the battery life.
+- **Battery**
+    * A bike battery is used and serves as the energy storage solution for the SolarPi project.
+- **Stepdown converter**
+    * The stepdown converter regulates the voltage output from the battery or solar panel to match the requirements of specific components.
+       It ensures a consistent and appropriate voltage level for the Raspberry Pi.
 
 ## Software Components
 
