@@ -2,6 +2,8 @@
 
 # SolarPi
 
+🌱 **Project Status: Recently Initiated, Work in Progress**
+
 ## Overview 
 
 The SolarPi project focuses on harnessing solar energy to power a Raspberry Pi while incorporating it into a versatile setup as both a backend server and a weather station. The following aspects encapsulate the project's hardware and software components:
