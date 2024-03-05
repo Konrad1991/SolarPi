@@ -1,3 +1,5 @@
+<p align="justify">
+
 # SolarPi
 
 ## Overview 
@@ -16,4 +18,7 @@ We provide a comprehensive list of components, accompanied by a schematic plan a
 
  ## Language Choice
 
- Throughout the entire project, the language of choice for coding is Rust, ensuring robust and efficient implementation.
+Throughout the entire project, the language of choice for coding is Rust, ensuring robust and efficient implementation.
+
+
+</p>
