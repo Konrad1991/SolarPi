@@ -39,9 +39,4 @@ We provide a comprehensive list of components, accompanied by a schematic plan a
 - Secondly, we delve into the code responsible for controlling various sensors measuring light, humidity, temperature, and more.
 - Finally, we address the software dedicated to utilizing the Raspberry Pi as a backend server. This involves crafting code for both the Pi itself and our personal computers and smartphones. 
 
- ## Language Choice
-
-Throughout the entire project, the language of choice for coding is Rust, ensuring robust and efficient implementation.
-
-
 </p>
