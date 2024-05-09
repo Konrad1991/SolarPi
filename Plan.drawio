@@ -1,23 +1,23 @@
-<mxfile host="app.diagrams.net" modified="2024-05-09T12:22:37.722Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0" etag="3rJ1MZXY0eW_j5UObSpg" version="21.6.8" type="github">
+<mxfile host="app.diagrams.net" modified="2024-05-09T12:24:32.463Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0" etag="4K4uEAs10s5vs3ShQYn_" version="21.6.8" type="github">
   <diagram name="Page-1" id="wlakbD712wwlNp6-Xunv">
     <mxGraphModel dx="1434" dy="766" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="bZQcsfnl17OWeuW7Iqxn-1" value="RaspberryPi&lt;br&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="60" y="40" width="80" height="80" as="geometry" />
+          <mxGeometry x="120" y="40" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="bZQcsfnl17OWeuW7Iqxn-2" value="" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="520" y="40" width="280" height="280" as="geometry" />
-        </mxCell>
-        <mxCell id="bZQcsfnl17OWeuW7Iqxn-3" value="" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="520" y="360" width="280" height="280" as="geometry" />
-        </mxCell>
-        <mxCell id="bZQcsfnl17OWeuW7Iqxn-4" value="&lt;div align=&quot;left&quot;&gt;&lt;b&gt;Admin Dashboard&lt;/b&gt;&lt;br&gt;- User registration bekommt public Key&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- Device registration&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;" vertex="1" parent="1">
+        <mxCell id="bZQcsfnl17OWeuW7Iqxn-4" value="&lt;div align=&quot;left&quot;&gt;&lt;b&gt;Admin Dashboard&lt;/b&gt;&lt;br&gt;- User registration bekommt public Key&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;" vertex="1" parent="1">
           <mxGeometry x="40" y="130" width="210" height="70" as="geometry" />
         </mxCell>
         <mxCell id="bZQcsfnl17OWeuW7Iqxn-5" value="&lt;div align=&quot;left&quot;&gt;&lt;b&gt;Rest API&lt;/b&gt;&lt;br&gt;- POST data&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- Authentication public key&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;" vertex="1" parent="1">
           <mxGeometry x="40" y="210" width="210" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="bZQcsfnl17OWeuW7Iqxn-7" value="Android /IOS -Phone" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="610" y="40" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="bZQcsfnl17OWeuW7Iqxn-9" value="&lt;b&gt;App&lt;br&gt;&lt;/b&gt;- makes backup regularly" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;" vertex="1" parent="1">
+          <mxGeometry x="560" y="130" width="210" height="70" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
