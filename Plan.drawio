@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-05-09T12:35:01.196Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0" etag="pbAtkstn1TLYe2uPvwXF" version="21.6.8" type="github">
+<mxfile host="app.diagrams.net" modified="2024-05-09T12:36:10.805Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0" etag="HQ3rAdr_yGRUUM3SvTY4" version="21.6.8" type="github">
   <diagram name="Page-1" id="wlakbD712wwlNp6-Xunv">
     <mxGraphModel dx="1434" dy="766" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -32,10 +32,10 @@
           <mxGeometry x="520" y="490" width="320" height="50" as="geometry" />
         </mxCell>
         <mxCell id="bZQcsfnl17OWeuW7Iqxn-15" value="Routes Admin Dashboard" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
-          <mxGeometry x="40" y="320" width="200" height="90" as="geometry" />
+          <mxGeometry x="40" y="320" width="200" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="bZQcsfnl17OWeuW7Iqxn-16" value="&lt;div align=&quot;left&quot;&gt;- POST new USER&lt;br&gt;- GET all users&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- PUTS update USER&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- GET is user data unique&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="bZQcsfnl17OWeuW7Iqxn-15">
-          <mxGeometry x="12" y="23" width="160" height="70" as="geometry" />
+        <mxCell id="bZQcsfnl17OWeuW7Iqxn-16" value="&lt;div align=&quot;left&quot;&gt;- POST new USER&lt;br&gt;- GET all users&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- PUTS update USER&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- GET is user data unique&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- DELETE USER&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;- POST restart Pi&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="bZQcsfnl17OWeuW7Iqxn-15">
+          <mxGeometry x="12" y="12" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="bZQcsfnl17OWeuW7Iqxn-19" value="Routes Rest API" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
           <mxGeometry x="40" y="488" width="200" height="90" as="geometry" />
