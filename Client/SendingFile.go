@@ -10,13 +10,10 @@ import (
 )
 
 func main() {
-	// URL of the API endpoint to upload a file
 	apiURL := "http://localhost:8080/books/upload"
 
-	// Path to the file to upload
-	filePath := "./Readme.txt" // Replace with the path to your file
+	filePath := "./Readme.txt" 
 
-	// Open the file
 	file, err := os.Open(filePath)
 	if err != nil {
 		fmt.Printf("Error opening file: %s\n", err)
@@ -24,11 +21,9 @@ func main() {
 	}
 	defer file.Close()
 
-	// Create a new HTTP multipart request
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	// Add the file to the request
 	part, err := writer.CreateFormFile("file", filePath)
 	if err != nil {
 		fmt.Printf("Error creating form file: %s\n", err)
@@ -68,4 +63,5 @@ func main() {
 
 	fmt.Println("File uploaded successfully!")
 }
+
 
