@@ -1,4 +1,5 @@
 // NOTE: https://github.com/mattn/go-sqlite3/issues/803
+// export CGO_CFLAGS="-g -O2 -Wno-return-local-addr"
 package Server
 
 import (
@@ -6,8 +7,9 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"net/http"
-  "errors"
+  // "errors"
   "time"
+  "fmt"
 )
 
 type File struct {
@@ -28,13 +30,12 @@ func Server(ip_addr string) (error, *gin.Engine) {
   r.SetTrustedProxies(nil)
   // r.SetTrustedProxies([]string{"192.168.1.2"}) // TODO: check what is this?
 
-  DB, err := gorm.Open("sqlite3", "test.DB")
-	if err != nil {
-		return errors.New("Failed to connect to database"), nil
-	}
-	defer DB.Close()
-
-	DB.AutoMigrate(&File{})
+	//  DB, err := gorm.Open("sqlite3", "./internal/Server/test.db")
+	// if err != nil {
+	// 	return errors.New("Failed to connect to database"), nil
+	// }
+	//
+	// DB.AutoMigrate(&File{})
 
 	r.GET("/GetFiles", getFiles)
 	r.GET("/GetFile/:id", getFile)
@@ -47,24 +48,33 @@ func Server(ip_addr string) (error, *gin.Engine) {
 }
 
 func uploadFile(c *gin.Context) {
+  fmt.Println("uploadFile0")
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to parse multipart form"})
 		return
 	}
+  fmt.Println("uploadFile1")
 	file_name := c.Request.FormValue("FileName")
 	file, _, err := c.Request.FormFile("file")
 
-  // fileTest := file.Open()
-
+  fmt.Println("uploadFile2")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "File not found in request"})
 		return
 	}
+ 
+  fmt.Println("uploadFile3")
+  fmt.Println("file_name: ", file_name)
 	defer file.Close()
 	file_struct := File{
 		FileName: file_name,
+    Size: 0, // TODO: get file size
+    Date: time.Now(),
+    Extension: "TODO: get file extension",
 	}
+
+  fmt.Println(DB == nil)
 	DB.Create(&file_struct)
   // TODO: where is the file saved? saved to DB?
 	c.JSON(http.StatusCreated, file_struct)
@@ -107,6 +117,7 @@ func updateFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
+
 	DB.Save(&file)
 	c.JSON(http.StatusOK, file)
 }
