@@ -3,85 +3,98 @@
 package Server
 
 import (
+	"errors"
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"net/http"
-  // "errors"
-  "time"
-  "fmt"
 )
 
 type File struct {
-	ID     uint   `json:"id" gorm:"primary_key"`
-  FileName string `json:"file_name"`
-  Size int64 `json:"file_name"` // TODO: is this the correct type?
-  Date time.Time `json:"date"` // TODO: is this the correct type?
-  Extension string `json:"extension"`
-  // TODO: file path (required?)
+	ID        uint      `json:"id" gorm:"primary_key"`
+	FileName  string    `json:"file_name"`
+	Size      int64     `json:"file_size"`
+	Date      time.Time `json:"date"`
+	Extension string    `json:"extension"`
 }
 
 var DB *gorm.DB
 
-func Server(ip_addr string) (error, *gin.Engine) {
+// Init database
+func initDB() error {
+	DB, err := gorm.Open("sqlite3", "./internal/Server/test.db")
+	if err != nil {
+		return errors.New("Failed to connect to database")
+	}
+	DB.AutoMigrate(&File{})
+	return nil
+}
+
+// create gin router
+func createRouter(ip string) *gin.Engine {
 	r := gin.Default()
+	r.SetTrustedProxies(nil)
+	// r.SetTrustedProxies([]string{"192.168.1.2"}
+	return r
+}
 
-  // TODO: handle ip address
-  r.SetTrustedProxies(nil)
-  // r.SetTrustedProxies([]string{"192.168.1.2"}) // TODO: check what is this?
-
-	//  DB, err := gorm.Open("sqlite3", "./internal/Server/test.db")
-	// if err != nil {
-	// 	return errors.New("Failed to connect to database"), nil
-	// }
-	//
-	// DB.AutoMigrate(&File{})
-
+// Create routes
+func createRoutes(r *gin.Engine) {
 	r.GET("/GetFiles", getFiles)
 	r.GET("/GetFile/:id", getFile)
-  r.POST("/CreateFile", createFile) // NOTE: an empty file is created
+	r.POST("/CreateFile", createFile) // NOTE: an empty file is created
 	r.PUT("/UpdateFile/:id", updateFile)
 	r.DELETE("/DeleteFile/:id", deleteFile)
 	r.POST("/UploadFile", uploadFile)
-
-  return nil, r
 }
 
+func Server(ip_addr string) (error, *gin.Engine) {
+	initDB()
+	r := createRouter(ip_addr)
+	createRoutes(r)
+	return nil, r
+}
+
+// Definition of routes
+// ===============================================================================
 func uploadFile(c *gin.Context) {
-  fmt.Println("uploadFile0")
+	fmt.Println("uploadFile0")
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to parse multipart form"})
 		return
 	}
-  fmt.Println("uploadFile1")
+	fmt.Println("uploadFile1")
 	file_name := c.Request.FormValue("FileName")
 	file, _, err := c.Request.FormFile("file")
 
-  fmt.Println("uploadFile2")
+	fmt.Println("uploadFile2")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "File not found in request"})
 		return
 	}
- 
-  fmt.Println("uploadFile3")
-  fmt.Println("file_name: ", file_name)
+
+	fmt.Println("uploadFile3")
+	fmt.Println("file_name: ", file_name)
 	defer file.Close()
 	file_struct := File{
-		FileName: file_name,
-    Size: 0, // TODO: get file size
-    Date: time.Now(),
-    Extension: "TODO: get file extension",
+		FileName:  file_name,
+		Size:      0, // TODO: get file size
+		Date:      time.Now(),
+		Extension: "TODO: get file extension",
 	}
 
-  fmt.Println(DB == nil)
+	fmt.Println(DB == nil)
 	DB.Create(&file_struct)
-  // TODO: where is the file saved? saved to DB?
+	// TODO: where is the file saved? saved to DB?
 	c.JSON(http.StatusCreated, file_struct)
 }
 
 func getFiles(c *gin.Context) { // NOTE: request all files
-	var  files []File
+	var files []File
 	DB.Find(&files)
 	c.JSON(http.StatusOK, files)
 }
@@ -132,4 +145,3 @@ func deleteFile(c *gin.Context) {
 	DB.Delete(&file)
 	c.JSON(http.StatusOK, gin.H{"message": "File could not be deleted"})
 }
-
