@@ -6,10 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -24,14 +26,15 @@ type File struct {
 	Size      int64     `json:"file_size"`
 	Date      time.Time `json:"date"`
 	Extension string    `json:"extension"`
+	Content   []byte    `json:"content"`
 }
 
 var database *gorm.DB
 
 // Init database
-func initDatabase() error {
+func initDatabase(databaseName string) error {
 	var err error
-	database, err = gorm.Open("sqlite3", "./test.db")
+	database, err = gorm.Open("sqlite3", databaseName)
 	if err != nil {
 		return errors.New("Failed to connect to database")
 	}
@@ -67,9 +70,9 @@ func createRoutes(r *gin.Engine) {
 	r.POST("/UploadFile", uploadFile)
 }
 
-func StartServer(ip_addr string) error {
+func StartServer(ip_addr string, databaseName string) error {
 	// Database
-	if err := initDatabase(); err != nil {
+	if err := initDatabase(databaseName); err != nil {
 		return err
 	}
 	defer func() {
@@ -103,35 +106,36 @@ func StartServer(ip_addr string) error {
 // Definition of routes
 // ===============================================================================
 func uploadFile(c *gin.Context) {
-	fmt.Println("uploadFile0")
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to parse multipart form"})
 		return
 	}
-	fmt.Println("uploadFile1")
 	file_name := c.Request.FormValue("FileName")
-	file, _, err := c.Request.FormFile("file")
-
-	fmt.Println("uploadFile2")
+	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "File not found in request"})
 		return
 	}
-
-	fmt.Println("uploadFile3")
-	fmt.Println("file_name: ", file_name)
 	defer file.Close()
+	fileContent, err := io.ReadAll(file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file content"})
+		return
+	}
+	splitted_file := strings.SplitAfter(header.Filename, ".")
+	ext := "none"
+	if len(splitted_file) != 1 {
+		ext = splitted_file[len(splitted_file)-1]
+	}
 	file_struct := File{
 		FileName:  file_name,
-		Size:      0, // TODO: get file size
+		Size:      int64(len(fileContent)),
 		Date:      time.Now(),
-		Extension: "TODO: get file extension",
+		Extension: ext,
+		Content:   fileContent,
 	}
-
-	fmt.Println(database == nil)
 	database.Create(&file_struct)
-	// TODO: where is the file saved? saved to database?
 	c.JSON(http.StatusCreated, file_struct)
 }
 
