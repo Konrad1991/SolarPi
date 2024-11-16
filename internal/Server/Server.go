@@ -29,8 +29,9 @@ type File struct {
 var database *gorm.DB
 
 // Init database
-func initdatabase() error {
-	database, err := gorm.Open("sqlite3", "./internal/Server/test.db")
+func initDatabase() error {
+	var err error
+	database, err = gorm.Open("sqlite3", "./test.db")
 	if err != nil {
 		return errors.New("Failed to connect to database")
 	}
@@ -68,12 +69,12 @@ func createRoutes(r *gin.Engine) {
 
 func StartServer(ip_addr string) error {
 	// Database
-	err := initdatabase()
-	if err != nil {
+	if err := initDatabase(); err != nil {
 		return err
 	}
 	defer func() {
-		database.Close()
+		sqlDB := database.DB()
+		sqlDB.Close()
 	}()
 
 	// Router & Server
