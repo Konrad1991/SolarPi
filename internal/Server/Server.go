@@ -3,9 +3,14 @@
 package Server
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,24 +26,34 @@ type File struct {
 	Extension string    `json:"extension"`
 }
 
-var DB *gorm.DB
+var database *gorm.DB
 
 // Init database
-func initDB() error {
-	DB, err := gorm.Open("sqlite3", "./internal/Server/test.db")
+func initdatabase() error {
+	database, err := gorm.Open("sqlite3", "./internal/Server/test.db")
 	if err != nil {
 		return errors.New("Failed to connect to database")
 	}
-	DB.AutoMigrate(&File{})
+	database.AutoMigrate(&File{})
 	return nil
 }
 
-// create gin router
-func createRouter(ip string) *gin.Engine {
-	r := gin.Default()
-	r.SetTrustedProxies(nil)
-	// r.SetTrustedProxies([]string{"192.168.1.2"}
-	return r
+// Create gin router
+func createRouter() *gin.Engine {
+	router := gin.Default()
+	router.GET("/", func(c *gin.Context) {
+		time.Sleep(5 * time.Second)
+		c.String(http.StatusOK, "Welcome SolarPi Server")
+	})
+	return router
+}
+
+// Create server
+func createServer(ip string, router *gin.Engine) *http.Server {
+	return &http.Server{
+		Addr:    ip, //":8080",
+		Handler: router,
+	}
 }
 
 // Create routes
@@ -51,11 +66,37 @@ func createRoutes(r *gin.Engine) {
 	r.POST("/UploadFile", uploadFile)
 }
 
-func Server(ip_addr string) (error, *gin.Engine) {
-	initDB()
-	r := createRouter(ip_addr)
+func StartServer(ip_addr string) error {
+	// Database
+	err := initdatabase()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		database.Close()
+	}()
+
+	// Router & Server
+	r := createRouter()
 	createRoutes(r)
-	return nil, r
+	srv := createServer(ip_addr, r)
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		return fmt.Errorf("Server forced to shutdown: %w", err)
+	}
+	return nil
 }
 
 // Definition of routes
@@ -87,22 +128,22 @@ func uploadFile(c *gin.Context) {
 		Extension: "TODO: get file extension",
 	}
 
-	fmt.Println(DB == nil)
-	DB.Create(&file_struct)
-	// TODO: where is the file saved? saved to DB?
+	fmt.Println(database == nil)
+	database.Create(&file_struct)
+	// TODO: where is the file saved? saved to database?
 	c.JSON(http.StatusCreated, file_struct)
 }
 
 func getFiles(c *gin.Context) { // NOTE: request all files
 	var files []File
-	DB.Find(&files)
+	database.Find(&files)
 	c.JSON(http.StatusOK, files)
 }
 
 func getFile(c *gin.Context) { // NOTE: request one file
 	id := c.Param("id")
 	var file File
-	if err := DB.First(&file, id).Error; err != nil {
+	if err := database.First(&file, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
@@ -115,14 +156,14 @@ func createFile(c *gin.Context) { // NOTE: create a new empty file
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	DB.Create(&file)
+	database.Create(&file)
 	c.JSON(http.StatusCreated, file)
 }
 
 func updateFile(c *gin.Context) {
 	id := c.Param("id")
 	var file File
-	if err := DB.First(&file, id).Error; err != nil {
+	if err := database.First(&file, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
@@ -130,18 +171,17 @@ func updateFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-
-	DB.Save(&file)
+	database.Save(&file)
 	c.JSON(http.StatusOK, file)
 }
 
 func deleteFile(c *gin.Context) {
 	id := c.Param("id")
 	var file File
-	if err := DB.First(&file, id).Error; err != nil {
+	if err := database.First(&file, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
-	DB.Delete(&file)
+	database.Delete(&file)
 	c.JSON(http.StatusOK, gin.H{"message": "File could not be deleted"})
 }
