@@ -20,6 +20,16 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
+type User struct {
+	ID                  uint      `json:"id" gorm:"primary_key"`
+	name                string    `json:"name"`
+	password_hash       string    `json:"password_hash"`
+	public_key          string    `json:"public_key"`
+	created_at          time.Time `json:"created_at"`
+	updated_at          time.Time `json:"updated_at"`
+	user_root_directory string    `json:"user_root_directory"`
+}
+
 type File struct {
 	ID        uint      `json:"id" gorm:"primary_key"`
 	FileName  string    `json:"file_name"`
@@ -39,6 +49,7 @@ func initDatabase(databaseName string) error {
 		return errors.New("Failed to connect to database")
 	}
 	database.AutoMigrate(&File{})
+	database.AutoMigrate(&User{})
 	return nil
 }
 
@@ -68,6 +79,11 @@ func createRoutes(r *gin.Engine) {
 	r.PUT("/UpdateFile/:id", updateFile)
 	r.DELETE("/DeleteFile/:id", deleteFile)
 	r.POST("/UploadFile", uploadFile)
+
+	r.POST("/CreateUser", createUser)
+	r.PUT("/UpdateUser/:id", updateUser)
+	r.DELETE("/DeleteUser/:id", deleteUser)
+	r.GET("/GetAllUsers", getAllUsers)
 }
 
 func StartServer(ip_addr string, databaseName string) error {
@@ -104,6 +120,9 @@ func StartServer(ip_addr string, databaseName string) error {
 }
 
 // Definition of routes
+// ===============================================================================
+
+// File routes
 // ===============================================================================
 func uploadFile(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(10 << 20)
@@ -189,4 +208,9 @@ func deleteFile(c *gin.Context) {
 	}
 	database.Delete(&file)
 	c.JSON(http.StatusOK, gin.H{"message": "File could not be deleted"})
+}
+
+// User routes
+// ===============================================================================
+func createUser(c *gin.Context) {
 }
