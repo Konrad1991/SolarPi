@@ -81,9 +81,9 @@ func createRoutes(r *gin.Engine) {
 	r.POST("/UploadFile", uploadFile)
 
 	r.POST("/CreateUser", createUser)
-	r.PUT("/UpdateUser/:id", updateUser)
-	r.DELETE("/DeleteUser/:id", deleteUser)
-	r.GET("/GetAllUsers", getAllUsers)
+	// r.PUT("/UpdateUser/:id", updateUser)
+	// r.DELETE("/DeleteUser/:id", deleteUser)
+	// r.GET("/GetAllUsers", getAllUsers)
 }
 
 func StartServer(ip_addr string, databaseName string) error {
@@ -213,4 +213,32 @@ func deleteFile(c *gin.Context) {
 // User routes
 // ===============================================================================
 func createUser(c *gin.Context) {
+	err := c.Request.ParseMultipartForm(10 << 20)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to parse multipart form"})
+		return
+	}
+	name := c.Request.FormValue("Name")
+	password_hash := c.Request.FormValue("PasswordHash")
+	public_key := c.Request.FormValue("PublicKey")
+	t := time.Now()
+	user_root_dir := c.Request.FormValue("UserRootDirectory")
+	if name == "" || password_hash == "" || public_key == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
+		return
+	}
+	new_user := User{
+		name:                name,
+		password_hash:       password_hash,
+		public_key:          public_key,
+		created_at:          t,
+		updated_at:          t,
+		user_root_directory: user_root_dir,
+	}
+	if err := database.Create(&new_user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError,
+			gin.H{"error": "Failed to create user"})
+		return
+	}
+	c.JSON(http.StatusCreated, new_user)
 }
