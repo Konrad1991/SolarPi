@@ -21,13 +21,13 @@ import (
 )
 
 type User struct {
-	ID                  uint      `json:"id" gorm:"primary_key"`
-	name                string    `json:"name"`
-	password_hash       string    `json:"password_hash"`
-	public_key          string    `json:"public_key"`
-	created_at          time.Time `json:"created_at"`
-	updated_at          time.Time `json:"updated_at"`
-	user_root_directory string    `json:"user_root_directory"`
+	ID                uint      `json:"id" gorm:"primary_key"`
+	Name              string    `json:"name" gorm:"unique"`
+	PasswordHash      string    `json:"password_hash"`
+	PublicKey         string    `json:"public_key"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
+	UserRootDirectory string    `json:"user_root_directory"`
 }
 
 type File struct {
@@ -51,6 +51,14 @@ func initDatabase(databaseName string) error {
 	database.AutoMigrate(&File{})
 	database.AutoMigrate(&User{})
 	return nil
+}
+
+// used for testing
+func ResetTestDB() {
+	if database != nil {
+		database.DropTableIfExists(&User{}, &File{})
+		database.AutoMigrate(&User{}, &File{})
+	}
 }
 
 // Create gin router
@@ -82,8 +90,8 @@ func createRoutes(r *gin.Engine) {
 
 	r.POST("/CreateUser", createUser)
 	// r.PUT("/UpdateUser/:id", updateUser)
-	// r.DELETE("/DeleteUser/:id", deleteUser)
-	// r.GET("/GetAllUsers", getAllUsers)
+	r.DELETE("/DeleteUser/:Name", deleteUser)
+	r.GET("/GetAllUsers", getAllUsers)
 }
 
 func StartServer(ip_addr string, databaseName string) error {
@@ -212,6 +220,18 @@ func deleteFile(c *gin.Context) {
 
 // User routes
 // ===============================================================================
+func checkUser(c *gin.Context, user *User) error {
+	if user.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User name is empty"})
+		return fmt.Errorf("User name is empty")
+	}
+	if user.PasswordHash == "" && user.PublicKey == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Neither password nor public key are provided"})
+		return fmt.Errorf("Neither password nor public key are provided")
+	}
+	return nil
+}
+
 func createUser(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
@@ -223,22 +243,42 @@ func createUser(c *gin.Context) {
 	public_key := c.Request.FormValue("PublicKey")
 	t := time.Now()
 	user_root_dir := c.Request.FormValue("UserRootDirectory")
-	if name == "" || password_hash == "" || public_key == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
+	new_user := User{
+		Name:              name,
+		PasswordHash:      password_hash,
+		PublicKey:         public_key,
+		CreatedAt:         t,
+		UpdatedAt:         t,
+		UserRootDirectory: user_root_dir,
+	}
+
+	err = checkUser(c, &new_user)
+	if err != nil {
 		return
 	}
-	new_user := User{
-		name:                name,
-		password_hash:       password_hash,
-		public_key:          public_key,
-		created_at:          t,
-		updated_at:          t,
-		user_root_directory: user_root_dir,
-	}
-	if err := database.Create(&new_user).Error; err != nil {
+	err = database.Create(&new_user).Error
+	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			gin.H{"error": "Failed to create user"})
 		return
 	}
 	c.JSON(http.StatusCreated, new_user)
+}
+
+func deleteUser(c *gin.Context) {
+	name := c.Param("Name")
+	var user User
+	err := database.Where("name = ?", name).First(&user).Error
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	database.Delete(&user)
+	c.JSON(http.StatusOK, gin.H{"message": "User successfully deleted"})
+}
+
+func getAllUsers(c *gin.Context) {
+	var users []User
+	database.Find(&users)
+	c.JSON(http.StatusOK, users)
 }
