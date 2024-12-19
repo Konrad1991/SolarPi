@@ -18,6 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -92,6 +93,7 @@ func createRoutes(r *gin.Engine) {
 	// r.PUT("/UpdateUser/:id", updateUser)
 	r.DELETE("/DeleteUser/:Name", deleteUser)
 	r.GET("/GetAllUsers", getAllUsers)
+	r.POST("/Login", loginUser)
 }
 
 func StartServer(ip_addr string, databaseName string) error {
@@ -220,6 +222,15 @@ func deleteFile(c *gin.Context) {
 
 // User routes
 // ===============================================================================
+func hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(hash), err
+}
+
+func checkPasswordHash(password, hash string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
+}
+
 func checkUser(c *gin.Context, user *User) error {
 	if user.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User name is empty"})
@@ -281,4 +292,8 @@ func getAllUsers(c *gin.Context) {
 	var users []User
 	database.Find(&users)
 	c.JSON(http.StatusOK, users)
+}
+
+func loginUser(c *gin.Context) {
+	// TODO:
 }
