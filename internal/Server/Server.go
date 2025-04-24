@@ -92,9 +92,9 @@ func createRoutes(r *gin.Engine) {
 	r.POST("/CreateUser", createUser)
 	// r.PUT("/UpdateUser/:id", updateUser)
 	r.DELETE("/DeleteUser/:Name", deleteUser)
+	r.DELETE("/DeleteUserByID/:id", deleteUserByID)
 	r.GET("/GetAllUsers", getAllUsers)
 	r.POST("/Login", loginUser)
-	r.DELETE("/DeleteUserByID/:id", deleteUserByID)
 }
 
 func StartServer(ip_addr string, databaseName string) error {
@@ -131,9 +131,6 @@ func StartServer(ip_addr string, databaseName string) error {
 	}
 	return nil
 }
-
-// Definition of routes
-// ===============================================================================
 
 // File routes
 // ===============================================================================
@@ -319,4 +316,20 @@ func getAllUsers(c *gin.Context) {
 
 func loginUser(c *gin.Context) {
 	// TODO:
+	// User sends name & password
+	// Check password via bcrypt.CompareHashAndPassword(...)
 }
+
+// JWT (token-based, stateless)
+// If login is successful, generate a JWT (signed token)
+// Send it back to the client
+// Client sends it in the Authorization header on each request
+// Good for CLI or React frontend. No server-side storage needed.
+
+/*
+token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+    "name": user.Name,
+    "exp":  time.Now().Add(time.Hour * 24).Unix(),
+})
+tokenString, _ := token.SignedString([]byte(secretKey))
+*/
