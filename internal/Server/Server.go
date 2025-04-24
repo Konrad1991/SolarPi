@@ -24,8 +24,7 @@ import (
 type User struct {
 	ID                uint      `json:"id" gorm:"primary_key"`
 	Name              string    `json:"name" gorm:"unique"`
-	PasswordHash      string    `json:"password_hash"`
-	PublicKey         string    `json:"public_key"`
+	Password          string    `json:"password"`
 	CreatedAt         time.Time `json:"created_at"`
 	UpdatedAt         time.Time `json:"updated_at"`
 	UserRootDirectory string    `json:"user_root_directory"`
@@ -74,6 +73,7 @@ func createRouter() *gin.Engine {
 
 // Create server
 func createServer(ip string, router *gin.Engine) *http.Server {
+	// TODO: check whether https.Server is existing
 	return &http.Server{
 		Addr:    ip, //":8080",
 		Handler: router,
@@ -94,6 +94,7 @@ func createRoutes(r *gin.Engine) {
 	r.DELETE("/DeleteUser/:Name", deleteUser)
 	r.GET("/GetAllUsers", getAllUsers)
 	r.POST("/Login", loginUser)
+	r.DELETE("/DeleteUserByID/:id", deleteUserByID)
 }
 
 func StartServer(ip_addr string, databaseName string) error {
@@ -111,8 +112,10 @@ func StartServer(ip_addr string, databaseName string) error {
 	createRoutes(r)
 	srv := createServer(ip_addr, r)
 
+	// TODO: Later in production use http and set nginx as reverse proxy
+	// Or get a valid certificate
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := srv.ListenAndServeTLS("cert.pem", "key.pem"); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
@@ -236,9 +239,14 @@ func checkUser(c *gin.Context, user *User) error {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User name is empty"})
 		return fmt.Errorf("User name is empty")
 	}
-	if user.PasswordHash == "" && user.PublicKey == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Neither password nor public key are provided"})
-		return fmt.Errorf("Neither password nor public key are provided")
+	var names []string
+	if err := database.Model(&User{}).Select("name").Pluck("name", &names).Error; err != nil {
+		return err
+	}
+	for i := 0; i < len(names); i++ {
+		if user.Name == names[i] {
+			return fmt.Errorf("User name not unique")
+		}
 	}
 	return nil
 }
@@ -250,14 +258,17 @@ func createUser(c *gin.Context) {
 		return
 	}
 	name := c.Request.FormValue("Name")
-	password_hash := c.Request.FormValue("PasswordHash")
-	public_key := c.Request.FormValue("PublicKey")
+	password := c.Request.FormValue("Password")
+	password_hashed, err := hashPassword(password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Hashing failed"})
+		return
+	}
 	t := time.Now()
 	user_root_dir := c.Request.FormValue("UserRootDirectory")
 	new_user := User{
 		Name:              name,
-		PasswordHash:      password_hash,
-		PublicKey:         public_key,
+		Password: password_hashed,
 		CreatedAt:         t,
 		UpdatedAt:         t,
 		UserRootDirectory: user_root_dir,
@@ -265,6 +276,7 @@ func createUser(c *gin.Context) {
 
 	err = checkUser(c, &new_user)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = database.Create(&new_user).Error
@@ -286,6 +298,17 @@ func deleteUser(c *gin.Context) {
 	}
 	database.Delete(&user)
 	c.JSON(http.StatusOK, gin.H{"message": "User successfully deleted"})
+}
+
+func deleteUserByID(c *gin.Context) {
+	id := c.Param("id")
+	var user User
+	if err := database.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	database.Delete(&user)
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted"})
 }
 
 func getAllUsers(c *gin.Context) {
